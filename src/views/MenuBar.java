@@ -22,11 +22,11 @@ public class MenuBar extends JMenuBar {
         gameOption.add(level);
 
         JMenuItem hardOption = new JMenuItem("Difícil");
-        hardOption.addActionListener(e -> panel.setDificultad("DIFICIL"));
+        hardOption.addActionListener(e -> panel.setDifficulty("DIFICIL"));
         JMenuItem mediumOption = new JMenuItem("Medio");
-        mediumOption.addActionListener(e -> panel.setDificultad("MEDIO"));
+        mediumOption.addActionListener(e -> panel.setDifficulty("MEDIO"));
         JMenuItem easyOption = new JMenuItem("Fácil");
-        easyOption.addActionListener(e -> panel.setDificultad("FACIL"));
+        easyOption.addActionListener(e -> panel.setDifficulty("FACIL"));
 
         level.add(hardOption);
         level.add(mediumOption);

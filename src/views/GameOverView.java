@@ -25,7 +25,6 @@ import javax.swing.border.EmptyBorder;
 
 import components.RoundButton;
 import components.RoundedPanel;
-import utils.UIText;
 import utils.AppFont;
 import utils.UIColors;
 

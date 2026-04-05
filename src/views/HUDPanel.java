@@ -8,6 +8,8 @@ import utils.UIColors;
 import java.awt.*;
 
 @SuppressWarnings("serial")
+
+//Panel que muestra los puntos y la dificultad en la que está
 public class HUDPanel extends JPanel {
 
     JLabel lblPuntos;

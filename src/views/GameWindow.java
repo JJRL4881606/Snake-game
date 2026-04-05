@@ -2,10 +2,8 @@ package views;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 
+import java.awt.BorderLayout;
 import java.awt.Image;
 
 @SuppressWarnings("serial")
@@ -16,18 +14,18 @@ public class GameWindow extends JFrame {
 
     public GameWindow() {
     	
-        setLayout(new java.awt.BorderLayout());
+        setLayout(new BorderLayout());
 
         hud = new HUDPanel();
         panel = new GameView();
 
-        add(hud, java.awt.BorderLayout.NORTH);
-        add(panel, java.awt.BorderLayout.CENTER);
+        add(hud, BorderLayout.NORTH);
+        add(panel, BorderLayout.CENTER);
 
         panel.setHUD(hud);
         
         //titulo
-        setTitle("Snake Game");
+        setTitle("Snake Game - Juego");
         
         //agregar menubar
         setJMenuBar(new MenuBar(panel));

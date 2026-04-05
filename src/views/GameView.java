@@ -464,7 +464,7 @@ public class GameView extends JPanel {
 	    createApple();
 	    playMusic();
 	    
-	    setDificultad(dificultad);
+	    setDifficulty(dificultad);
 	}
 	
 	public void pauseGame() {
@@ -495,10 +495,10 @@ public class GameView extends JPanel {
 	    this.hud = hud;
 	}
 	
-	public void setDificultad(String nivel) {
-	    this.dificultad = nivel;
+	public void setDifficulty(String level) {
+	    this.dificultad = level;
 
-	    switch (nivel) {
+	    switch (level) {
 	        case "FACIL":
 	            timer.setDelay(150);
 	            break;
@@ -513,7 +513,7 @@ public class GameView extends JPanel {
 	    }
 	    
 	    if (hud != null) {
-	        hud.setDificultad(nivel);
+	        hud.setDificultad(level);
 	    }
 	}
 

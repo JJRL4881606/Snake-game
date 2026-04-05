@@ -8,7 +8,7 @@ import java.awt.Image;
 public class GameOverWindow extends JFrame {
 
     public GameOverWindow(int puntos) {
-        setTitle("Snake Game");
+        setTitle("Snake Game - Game Over");
 
         Image icono = new ImageIcon(
     	    getClass().getResource("/images/cat-icon.png")

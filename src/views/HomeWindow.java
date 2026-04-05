@@ -8,7 +8,7 @@ import java.awt.Image;
 public class HomeWindow extends JFrame {
 
     public HomeWindow() {
-        setTitle("Snake Game");
+        setTitle("Snake Game - Home");
         
         Image icono = new ImageIcon(
     	    getClass().getResource("/images/cat-icon.png")
