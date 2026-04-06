@@ -3,13 +3,14 @@ package views;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 
 @SuppressWarnings("serial")
 public class MenuBar extends JMenuBar {
 
     public MenuBar(GameView panel) {
 
-        JMenu gameOption = new JMenu("Juego");
+        JMenu gameOption = new JMenu("Juego - Ajustes");
         add(gameOption);
 
         // NUEVO JUEGO
@@ -31,9 +32,21 @@ public class MenuBar extends JMenuBar {
         level.add(hardOption);
         level.add(mediumOption);
         level.add(easyOption);
+        
+        // MENU
+        JMenuItem menu = new JMenuItem("Regresar al menú");
+        menu.addActionListener(e -> {
+            if (panel.musica != null) {
+                panel.musica.stop();
+                panel.musica.close();
+            }
+            new HomeWindow();
+            SwingUtilities.getWindowAncestor(panel).dispose();
+        });
+        gameOption.add(menu);
 
         // PAUSA
-        JMenuItem pause = new JMenuItem("Pausar");
+        JMenuItem pause = new JMenuItem("Pausar / Reanudar");
         pause.addActionListener(e -> {
             if (panel.pausado) {
                 panel.resumeGame();

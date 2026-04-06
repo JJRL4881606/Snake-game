@@ -12,17 +12,19 @@ public class GameWindow extends JFrame {
     GameView panel;
     HUDPanel hud;
 
-    public GameWindow() {
+    public GameWindow(String dificultad) {
     	
         setLayout(new BorderLayout());
 
         hud = new HUDPanel();
         panel = new GameView();
-
+        panel.setHUD(hud);
+        panel.setDifficulty(dificultad);
+        hud.setDifficulty(dificultad);
+        
         add(hud, BorderLayout.NORTH);
         add(panel, BorderLayout.CENTER);
 
-        panel.setHUD(hud);
         
         //titulo
         setTitle("Snake Game - Juego");

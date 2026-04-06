@@ -8,8 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Window;
-import java.io.File;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -23,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import components.RoundButton;
+import components.RoundedButton;
 import components.RoundedPanel;
 import utils.AppFont;
 import utils.UIColors;
@@ -36,6 +34,14 @@ public class HomeView extends JPanel {
 	
 	//gif de fondo
 	Image backgroundGif;
+	
+	//CARGAR imagenes
+	
+	private static final ImageIcon PLAY_ICON =
+	    new ImageIcon(HomeView.class.getResource("/images/play.png"));
+
+	private static final ImageIcon CAT_GIF =
+	    new ImageIcon(HomeView.class.getResource("/images/cat.gif"));
 	
 	public HomeView() {
 		setLayout(new GridBagLayout());
@@ -59,7 +65,7 @@ public class HomeView extends JPanel {
 	    card.putClientProperty("FlatLaf.style", "arc:20");
 
 		card.setBorder(BorderFactory.createCompoundBorder(
-		    BorderFactory.createLineBorder(UIColors.BORDER_GREEN, 3, true), 
+		    BorderFactory.createLineBorder(UIColors.SNAKE_GREEN, 3, true), 
 		    BorderFactory.createEmptyBorder(25, 35, 25, 35) 
 		));		
 
@@ -103,9 +109,7 @@ public class HomeView extends JPanel {
 	    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	    panel.setOpaque(false);
 
-	    ImageIcon gif = new ImageIcon(
-	        getClass().getResource("/images/cat.gif")
-	    );
+	    ImageIcon gif = CAT_GIF;
 
 	    JLabel lblCat = new JLabel(gif);
 	    lblCat.setAlignmentX(CENTER_ALIGNMENT);
@@ -121,30 +125,20 @@ public class HomeView extends JPanel {
 	    panelButton.setBorder(new EmptyBorder(5, 20, 10, 20));
 	    panelButton.setOpaque(false);
 
-	    JButton btnPlay = new RoundButton(
-	        "PLAY",
-	        new ImageIcon(getClass().getResource("/images/play.png"))
-	    );
-
-	    btnPlay.setBackground(UIColors.BUTTON);
-	    btnPlay.setForeground(UIColors.BUTTON_TEXT);
-	    btnPlay.setToolTipText("Haz clic para jugar!");
-
-	    btnPlay.setFont(AppFont.subtitle());
-
-	    btnPlay.setPreferredSize(new Dimension(180, 60));
-	    btnPlay.setMaximumSize(new Dimension(180, 60));
-	    btnPlay.setMinimumSize(new Dimension(180, 60));
-
-	    btnPlay.setAlignmentX(CENTER_ALIGNMENT);
-	    btnPlay.setBorder(new EmptyBorder(10, 20, 10, 20));
+	    JButton btnPlay = new RoundedButton("JUGAR", PLAY_ICON);
+	    styleButton(btnPlay);
 	    
 	    btnPlay.addActionListener(e -> {
-	        new GameWindow();
-
+	    	new SelectLevelWindow(); 
+	    	   
 	        Window window = SwingUtilities.getWindowAncestor(btnPlay);
 	        if (window != null) {
-	            musica.close();
+	        	
+	        	if (musica != null) {
+	        	    musica.stop();
+	        	    musica.close();
+	        	}
+	        	
 	            window.dispose();
 	        }
 	    });
@@ -162,9 +156,10 @@ public class HomeView extends JPanel {
 	            musica.close();
 	        }
 
-	        File archivo = new File("src/music/oiia-cat-intro-play.wav");
-	        AudioInputStream audio = AudioSystem.getAudioInputStream(archivo);
-
+	        AudioInputStream audio = AudioSystem.getAudioInputStream(
+        	    getClass().getResource("/music/oiia-cat-intro-play.wav")
+        	);
+	        
 	        musica = AudioSystem.getClip();
 	        musica.open(audio);
 
@@ -172,7 +167,7 @@ public class HomeView extends JPanel {
 	        musica.start();
 
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        System.err.println("Error al reproducir música: " + e.getMessage());
 	    }
 	}
 	
@@ -184,5 +179,16 @@ public class HomeView extends JPanel {
 	    g.drawImage(backgroundGif, 0, 0, getWidth(), getHeight(), this);
 	}
 
+	//estilo del boton
+	private void styleButton(JButton btn) {
+	    btn.setFont(AppFont.subtitle());
+	    btn.setBackground(UIColors.SNAKE_GREEN);
+	    btn.setForeground(UIColors.BUTTON_TEXT);
+	    btn.setPreferredSize(new Dimension(240, 60));
+	    btn.setMaximumSize(new Dimension(240, 60));
+	    btn.setMinimumSize(new Dimension(240, 60));
+	    btn.setAlignmentX(CENTER_ALIGNMENT);
+	    btn.setBorder(new EmptyBorder(10, 20, 10, 20));
+	}
 
 }

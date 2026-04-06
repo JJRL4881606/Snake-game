@@ -9,8 +9,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Window;
-import java.io.File;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -24,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import components.RoundButton;
+import components.RoundedButton;
 import components.RoundedPanel;
 import utils.AppFont;
 import utils.UIColors;
@@ -37,6 +35,19 @@ public class SelectLevelView extends JPanel {
 	
 	//gif de fondo
 	Image backgroundGif;
+	
+	//cargar imagenes
+	private static final ImageIcon EASY_ICON =
+		    new ImageIcon(SelectLevelView.class.getResource("/images/Easy.png"));
+
+	private static final ImageIcon MID_ICON =
+	    new ImageIcon(SelectLevelView.class.getResource("/images/Mid.png"));
+
+	private static final ImageIcon HARD_ICON =
+	    new ImageIcon(SelectLevelView.class.getResource("/images/Hard.png"));
+
+	private static final ImageIcon HOME_ICON =
+	    new ImageIcon(SelectLevelView.class.getResource("/images/home.png"));
 	
 	public SelectLevelView() {
 		setLayout(new GridBagLayout());
@@ -60,15 +71,13 @@ public class SelectLevelView extends JPanel {
 	    card.putClientProperty("FlatLaf.style", "arc:20");
 
 		card.setBorder(BorderFactory.createCompoundBorder(
-		    BorderFactory.createLineBorder(UIColors.BORDER_GREEN, 3, true), 
+		    BorderFactory.createLineBorder(UIColors.SNAKE_GREEN, 3, true), 
 		    BorderFactory.createEmptyBorder(25, 35, 25, 35) 
 		));		
 
 	    card.add(createTitle());
 	    card.add(Box.createRigidArea(new Dimension(0, 20))); 
-	    card.add(createCat());		    
-	    card.add(Box.createRigidArea(new Dimension(0, 20))); 
-	    card.add(createButton());	
+	    card.add(createButtons());	
 	    	    
 	    GridBagConstraints gbc = new GridBagConstraints();
 	    gbc.gridx = 0;
@@ -82,16 +91,16 @@ public class SelectLevelView extends JPanel {
 	    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	    panel.setOpaque(false);	    
 	    
-		JLabel lblTitle1 = new JLabel("Seleccione");
+		JLabel lblTitle1 = new JLabel("SELECCIONE");
 		lblTitle1.setForeground(UIColors.SNAKE_GREEN);
 		lblTitle1.setBorder(new EmptyBorder(10, 20, 0, 20)); 
-		lblTitle1.setFont(AppFont.title());
+		lblTitle1.setFont(AppFont.subtitle());
 		lblTitle1.setAlignmentX(CENTER_ALIGNMENT);
 		
-		JLabel lblTitle2 = new JLabel("la dificultad");
+		JLabel lblTitle2 = new JLabel("LA DIFICULTAD");
 		lblTitle2.setForeground(UIColors.SNAKE_GREEN);
 		lblTitle2.setBorder(new EmptyBorder(0, 20, 10, 20)); 
-		lblTitle2.setFont(AppFont.title());
+		lblTitle2.setFont(AppFont.subtitle());
 		lblTitle2.setAlignmentX(CENTER_ALIGNMENT);
 
 	    panel.add(lblTitle1);
@@ -100,61 +109,65 @@ public class SelectLevelView extends JPanel {
 	    return panel;
 	}
 	
-	private JPanel createCat() {
-	    JPanel panel = new JPanel();
-	    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-	    panel.setOpaque(false);
-
-	    ImageIcon gif = new ImageIcon(
-	        getClass().getResource("/images/cat.gif")
-	    );
-
-	    JLabel lblCat = new JLabel(gif);
-	    lblCat.setAlignmentX(CENTER_ALIGNMENT);
-
-	    panel.add(lblCat);
-
-	    return panel;
-	}
-	
-	private JPanel createButton() {
+	private JPanel createButtons() {
 	    JPanel panelButton = new JPanel();
 	    panelButton.setLayout(new BoxLayout(panelButton, BoxLayout.Y_AXIS));
 	    panelButton.setBorder(new EmptyBorder(5, 20, 10, 20));
 	    panelButton.setOpaque(false);
 
-	    JButton btnPlay = new RoundButton(
-	        "PLAY",
-	        new ImageIcon(getClass().getResource("/images/play.png"))
-	    );
+	    JButton btnEasy = new RoundedButton("Facil", EASY_ICON);
+	    JButton btnMid = new RoundedButton("Media", MID_ICON);
+	    JButton btnHard = new RoundedButton("Dificil", HARD_ICON);
+	    JButton btnHome = new RoundedButton("MENU", HOME_ICON);
 
-	    btnPlay.setBackground(UIColors.BUTTON);
-	    btnPlay.setForeground(UIColors.BUTTON_TEXT);
-	    btnPlay.setToolTipText("Haz clic para jugar!");
-
-	    btnPlay.setFont(AppFont.subtitle());
-
-	    btnPlay.setPreferredSize(new Dimension(180, 60));
-	    btnPlay.setMaximumSize(new Dimension(180, 60));
-	    btnPlay.setMinimumSize(new Dimension(180, 60));
-
-	    btnPlay.setAlignmentX(CENTER_ALIGNMENT);
-	    btnPlay.setBorder(new EmptyBorder(10, 20, 10, 20));
+	    styleButton(btnEasy, Color.GREEN);
+	    styleButton(btnMid, Color.YELLOW);
+	    styleButton(btnHard, Color.RED);
+	    styleButton(btnHome, UIColors.SNAKE_GREEN);
 	    
-	    btnPlay.addActionListener(e -> {
-	        new GameWindow();
+	    btnEasy.addActionListener(e -> startGame("FACIL"));
+	    btnMid.addActionListener(e -> startGame("MEDIO"));
+	    btnHard.addActionListener(e -> startGame("DIFICIL"));
+	    btnHome.addActionListener(e -> {
+	    	new HomeWindow();
 
-	        Window window = SwingUtilities.getWindowAncestor(btnPlay);
+	        Window window = SwingUtilities.getWindowAncestor(btnHome);
 	        if (window != null) {
-	            musica.close();
+	        	if (musica != null) {
+	        	    musica.stop();
+	        	    musica.close();
+	        	}
 	            window.dispose();
 	        }
 	    });
 
-	    panelButton.add(btnPlay);
+	    panelButton.add(Box.createVerticalStrut(5));
+	    panelButton.add(btnEasy);
+	    panelButton.add(Box.createRigidArea(new Dimension(0, 10)));
+	    panelButton.add(btnMid);
+	    panelButton.add(Box.createRigidArea(new Dimension(0, 10)));
+	    panelButton.add(btnHard);
+	    panelButton.add(Box.createRigidArea(new Dimension(0, 10)));
+	    panelButton.add(btnHome);
+	    panelButton.add(Box.createVerticalStrut(5));
 
 	    return panelButton;
 	}
+	
+    private void startGame(String dificultad) {
+        new GameWindow(dificultad);
+
+        // cerrar ventana actual
+        Window window = SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+        	if (musica != null) {
+        	    musica.stop();
+        	    musica.close();
+        	}
+            window.dispose();
+        }
+    }
+
 	
 	public void playMusic() {
 	    try {
@@ -164,9 +177,10 @@ public class SelectLevelView extends JPanel {
 	            musica.close();
 	        }
 
-	        File archivo = new File("src/music/oiia-cat-intro-play.wav");
-	        AudioInputStream audio = AudioSystem.getAudioInputStream(archivo);
-
+	        AudioInputStream audio = AudioSystem.getAudioInputStream(
+        	    getClass().getResource("/music/oiia-cat-intro-play.wav")
+        	);
+	        
 	        musica = AudioSystem.getClip();
 	        musica.open(audio);
 
@@ -186,5 +200,15 @@ public class SelectLevelView extends JPanel {
 	    g.drawImage(backgroundGif, 0, 0, getWidth(), getHeight(), this);
 	}
 
+	private void styleButton(JButton btn, Color color) {
+	    btn.setBackground(color);
+	    btn.setForeground(UIColors.BUTTON_TEXT);
+	    btn.setFont(AppFont.subtitle());
+	    btn.setPreferredSize(new Dimension(240, 60));
+	    btn.setMaximumSize(new Dimension(240, 60));
+	    btn.setMinimumSize(new Dimension(240, 60));
+	    btn.setAlignmentX(CENTER_ALIGNMENT);
+	    btn.setBorder(new EmptyBorder(10, 20, 10, 20));
+	}
 
 }

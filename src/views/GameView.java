@@ -3,8 +3,10 @@ package views;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -22,6 +24,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import utils.AppFont;
+import utils.UIColors;
 
 @SuppressWarnings("serial")
 public class GameView extends JPanel {
@@ -81,6 +84,15 @@ public class GameView extends JPanel {
 	HUDPanel hud;
 	
 	Random rand = new Random();
+	
+	private static final Image BACKGROUND =
+	    new ImageIcon(GameView.class.getResource("/images/galaxy-game-bg.gif")).getImage();
+
+	private static final Image CAT =
+	    new ImageIcon(GameView.class.getResource("/images/snake-head.gif")).getImage();
+
+	private static final Image PAUSE_CAT =
+	    new ImageIcon(GameView.class.getResource("/images/pause-cat.gif")).getImage();
 
 	public GameView() {
 		// Posición inicial de la cabeza de la serpiente
@@ -101,10 +113,13 @@ public class GameView extends JPanel {
 		playMusic();
 		
 		//fondo
-		background = new ImageIcon(
-		    getClass().getResource("/images/galaxy-game-bg.gif")
-		).getImage();
+		background = BACKGROUND;	
 		
+		//gato jugador
+		catImage = CAT;
+		
+		//gato de pausa
+		pauseCat = PAUSE_CAT;
 		
 		// Configurar tamaño del panel
 		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -117,16 +132,6 @@ public class GameView extends JPanel {
 
 		// Solicitar el foco cuando el panel ya esté visible
 		SwingUtilities.invokeLater(() -> requestFocusInWindow());
-		
-		//gato jugador
-		catImage = new ImageIcon(
-		    getClass().getResource("/images/snake-head.gif")
-		).getImage();
-		
-		//gato de pausa
-		pauseCat = new ImageIcon(
-		    getClass().getResource("/images/pause-cat.gif")
-		).getImage();
 		
 		// Listener para detectar las teclas presionadas
 		this.addKeyListener(new KeyAdapter() {
@@ -209,34 +214,46 @@ public class GameView extends JPanel {
 			}
 			
 			comerManzana();
-			repaint();  // Redibuja el panel (se ejecuta paintComponent)
+			repaint();  // Redibuja el panel
 		});
 
-		timer.start(); //Inicia el timer, para detenerlo se puede usar timer.stop();
+		timer.start(); //Inicia el timer
 	}
 
 	// Método encargado de dibujar los elementos del juego
 	public void paintComponent(Graphics g) {
 	    super.paintComponent(g);
 	    
+	    Graphics2D g2 = (Graphics2D) g;
+
+	    g2.setRenderingHint(
+	        RenderingHints.KEY_TEXT_ANTIALIASING,
+	        RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+	    );
+
+	    g2.setRenderingHint(
+	        RenderingHints.KEY_ANTIALIASING,
+	        RenderingHints.VALUE_ANTIALIAS_ON
+	    );
+	    
 	    // fondo
-	    g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+	    g2.drawImage(background, 0, 0, getWidth(), getHeight(), this);
 	    
 	    // overlay oscuro 
-	    g.setColor(new Color(0, 0, 0, 120));
-	    g.fillRect(0, 0, getWidth(), getHeight());
+	    g2.setColor(new Color(0, 0, 0, 120));
+	    g2.fillRect(0, 0, getWidth(), getHeight());
 	    
 	    // Grid neon 
-	    g.setColor(new Color(0, 255, 100, 40));
+	    g2.setColor(new Color(0, 255, 100, 40));
 	    
 	    // Líneas verticales
 	    for (int i = 0; i < WIDTH / UNIT_SIZE; i++) {
-	        g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, HEIGHT);
+	        g2.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, HEIGHT);
 	    }
 
 	    //horizontales
 	    for (int i = 0; i < HEIGHT / UNIT_SIZE; i++) {
-	        g.drawLine(0, i * UNIT_SIZE, WIDTH, i * UNIT_SIZE);
+	        g2.drawLine(0, i * UNIT_SIZE, WIDTH, i * UNIT_SIZE);
 	    }
 
 		// Recorrer todas las partes de la serpiente
@@ -246,19 +263,19 @@ public class GameView extends JPanel {
 	        int y = snakeBody.get(i).y;
 
 	        //capa externa brillosa
-	        g.setColor(new Color(0, 255, 100, 40));
-	        g.fillRect(x - 4, y - 4, UNIT_SIZE + 8, UNIT_SIZE + 8);
+	        g2.setColor(new Color(0, 255, 100, 40));
+	        g2.fillRect(x - 4, y - 4, UNIT_SIZE + 8, UNIT_SIZE + 8);
 
 	        // CUERPO
 	        if (i == 0) {
-	            g.drawImage(catImage, x, y, UNIT_SIZE, UNIT_SIZE, this);
+	            g2.drawImage(catImage, x, y, UNIT_SIZE, UNIT_SIZE, this);
 	        } else {
 	            // Degradado en el cuerpo
 	            int intensidad = Math.max(100, 255 - (i * 10));
-	            g.setColor(new Color(0, intensidad, 100));
+	            g2.setColor(new Color(0, intensidad, 100));
 	        }
 
-	        g.fillRect(x, y, UNIT_SIZE, UNIT_SIZE);
+	        g2.fillRect(x, y, UNIT_SIZE, UNIT_SIZE);
 	    }
 	    
 	    //manzana
@@ -270,35 +287,47 @@ public class GameView extends JPanel {
 	    Color colorArcoiris = Color.getHSBColor(tonoArcoiris , 1.0f, 1.0f);
 
 	    // Glow externo
-	    g.setColor(new Color(colorArcoiris.getRed(), colorArcoiris.getGreen(), colorArcoiris.getBlue(), 40));
-	    g.fillOval(x - 6, y - 6, UNIT_SIZE + 12, UNIT_SIZE + 12);
+	    g2.setColor(new Color(colorArcoiris.getRed(), colorArcoiris.getGreen(), colorArcoiris.getBlue(), 40));
+	    g2.fillOval(x - 6, y - 6, UNIT_SIZE + 12, UNIT_SIZE + 12);
 
 	    // glow medio
-	    g.setColor(new Color(colorArcoiris.getRed(), colorArcoiris.getGreen(), colorArcoiris.getBlue(), 80));
-	    g.fillOval(x - 3, y - 3, UNIT_SIZE + 6, UNIT_SIZE + 6);
+	    g2.setColor(new Color(colorArcoiris.getRed(), colorArcoiris.getGreen(), colorArcoiris.getBlue(), 80));
+	    g2.fillOval(x - 3, y - 3, UNIT_SIZE + 6, UNIT_SIZE + 6);
 
 	    // centro
-	    g.setColor(colorArcoiris);
-	    g.fillOval(x, y, UNIT_SIZE, UNIT_SIZE);
+	    g2.setColor(colorArcoiris);
+	    g2.fillOval(x, y, UNIT_SIZE, UNIT_SIZE);
 	    
 	    //borde verde
-	    g.setColor(new Color(0, 255, 100));
-	    g.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
+	    g2.setColor(UIColors.SNAKE_GREEN);
+	    g2.drawRect(0, 0, WIDTH - 1, HEIGHT - 1);
 	    
 	    //texto pausa
 	    if (pausado) {
-	        g.setColor(new Color(0, 0, 0, 150));
-	        g.fillRect(0, 0, WIDTH, HEIGHT);
+	        g2.setColor(new Color(0, 0, 0, 150));
+	        g2.fillRect(0, 0, WIDTH, HEIGHT);
 
-	        g.setColor(new Color(0, 255, 100));
-	        g.setFont(AppFont.title());
+	        g2.setColor(UIColors.SNAKE_GREEN);
+	        g2.setFont(AppFont.title());
 
 	        String texto = "PAUSA";
-	        int anchoTexto = g.getFontMetrics().stringWidth(texto);
-	        g.drawString(texto, (WIDTH - anchoTexto) / 2, HEIGHT / 2);
+	        int anchoTexto = g2.getFontMetrics().stringWidth(texto);
+	        g2.drawString(texto, (WIDTH - anchoTexto) / 2, (HEIGHT / 2) - 100 );
 	        
 	        //gato de pausa
-	        g.drawImage(pauseCat, WIDTH/2 - 50, HEIGHT/2 + 20, 100, 100, this);
+	        g2.drawImage(pauseCat, WIDTH/2 - 50, HEIGHT/2 - 40, 100, 100, this);
+	        
+	        // texto ayuda
+	        g2.setFont(AppFont.big());
+	        g2.setColor(UIColors.SNAKE_GREEN);
+
+	        String ayuda = "Presiona P para reanudar";
+	        int anchoAyuda = g2.getFontMetrics().stringWidth(ayuda);
+
+	        int xTexto = (WIDTH - anchoAyuda) / 2;
+	        int yTexto = HEIGHT/2 + 120;
+
+	        g2.drawString(ayuda, xTexto, yTexto);
 	    }
 	}
 
@@ -327,7 +356,7 @@ public class GameView extends JPanel {
 		// Agregar una nueva cabeza en la posición actual
 		snakeBody.addFirst(new Point(snakeX, snakeY));
 
-		// Eliminar el último elemento para mantener el mismo tamaño
+		// Eliminar el ultimo elemento para mantener el mismo tamaño
 		snakeBody.removeLast();
 	}
 	
@@ -336,7 +365,7 @@ public class GameView extends JPanel {
 	{
 	    boolean posicionValida;
 
-	    // Repetir hasta encontrar una posición que no esté ocupada por la serpiente
+	    //repetir hasta encontrar una posición que no esté ocupada por la serpiente
 	    do {
 	        posicionValida = true;
 
@@ -351,10 +380,10 @@ public class GameView extends JPanel {
 	                break;
 	            }
 	        }
-	    } while (!posicionValida); // Reintentar si la posicion no es válida
+	    } while (!posicionValida); // Reintentar si la posicion no es valida
 	}
 	
-	//método de comer la manzana
+	//metodo de comer la manzana
 	public void comerManzana() 
 	{
 	    // Si la cabeza de la serpiente coincide con la posición de la manzana
@@ -382,8 +411,11 @@ public class GameView extends JPanel {
 			}
 
 			if (contadorVelocidad == aumento) {
-			    timer.setDelay(timer.getDelay() - 10);
-			    contadorVelocidad = 0;
+				
+				int nuevoDelay = Math.max(40, timer.getDelay() - 10);
+				timer.setDelay(nuevoDelay);
+			    
+				contadorVelocidad = 0;
 			}
 			
 			playSoundEffect("src/music/eat.wav");
@@ -513,7 +545,7 @@ public class GameView extends JPanel {
 	    }
 	    
 	    if (hud != null) {
-	        hud.setDificultad(level);
+	        hud.setDifficulty(level);
 	    }
 	}
 

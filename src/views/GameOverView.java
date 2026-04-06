@@ -8,8 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Window;
-import java.io.File;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -23,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import components.RoundButton;
+import components.RoundedButton;
 import components.RoundedPanel;
 import utils.AppFont;
 import utils.UIColors;
@@ -35,19 +33,20 @@ public class GameOverView extends JPanel {
 	Clip musica;
 	
 	int puntos;
+		
+	private final ImageIcon catIcon = new ImageIcon(
+	    getClass().getResource("/images/game-over-cat.png")
+	);
 	
-	Image backgroundGif;
-	
+	private final Image backgroundGif = new ImageIcon(
+	    getClass().getResource("/images/galaxy-gameover-bg.gif")
+	).getImage();
+
 	public GameOverView(int puntos) {
 	    this.puntos = puntos;
 
 		setLayout(new GridBagLayout());
-		this.setOpaque(false);
-		
-		backgroundGif = new ImageIcon(
-		    getClass().getResource("/images/galaxy-gameover-bg.gif")
-		).getImage();
-		
+		this.setOpaque(false);		
 	    
 	    playMusic();
 
@@ -56,15 +55,15 @@ public class GameOverView extends JPanel {
     
 	private void initializeComponents() {
 		RoundedPanel card = new RoundedPanel(50);
-		card.setOpaque(false); // transparente
-		card.setBackground(new Color(0, 0, 0, 100)); // negro semi transparente
+		card.setOpaque(false);
+		card.setBackground(new Color(0, 0, 0, 140)); 
 		card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 		card.setMaximumSize(new Dimension(500, Integer.MAX_VALUE));
 	    card.putClientProperty("FlatLaf.style", "arc:20");
 
 		card.setBorder(BorderFactory.createCompoundBorder(
-		    BorderFactory.createLineBorder(UIColors.SNAKE_GREEN, 3, true), // borde verde redondeado
-		    BorderFactory.createEmptyBorder(25, 35, 25, 35) // padding interno
+		    BorderFactory.createLineBorder(UIColors.SNAKE_GREEN, 3, true),
+		    BorderFactory.createEmptyBorder(25, 35, 25, 35)
 		));		
 		
 	    card.add(createTitle());
@@ -110,11 +109,7 @@ public class GameOverView extends JPanel {
 	    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	    panel.setOpaque(false);
 
-	    ImageIcon cat = new ImageIcon(
-	        getClass().getResource("/images/game-over-cat.png")
-	    );
-
-	    JLabel lblCat = new JLabel(cat);
+	    JLabel lblCat = new JLabel(catIcon);
 	    lblCat.setAlignmentX(CENTER_ALIGNMENT);
 
 	    panel.add(lblCat);
@@ -128,51 +123,43 @@ public class GameOverView extends JPanel {
 	    panelButton.setBorder(new EmptyBorder(5, 20, 10, 20));
 	    panelButton.setOpaque(false);
 
-	    JButton btnPlay = new RoundButton(
-	        "PLAY",
+	    JButton btnPlay = new RoundedButton(
+	        "JUGAR",
 	        new ImageIcon(getClass().getResource("/images/play.png"))
 	    );
 
-	    btnPlay.setBackground(UIColors.BUTTON);
-	    btnPlay.setForeground(UIColors.BUTTON_TEXT);
-	    btnPlay.setFont(AppFont.subtitle());
-	    btnPlay.setPreferredSize(new Dimension(180, 60));
-	    btnPlay.setMaximumSize(new Dimension(180, 60));
-	    btnPlay.setMinimumSize(new Dimension(180, 60));
-	    btnPlay.setAlignmentX(CENTER_ALIGNMENT);
-	    btnPlay.setBorder(new EmptyBorder(10, 20, 10, 20));
+	    styleButton(btnPlay);
 	    btnPlay.setToolTipText("Haz clic para jugar!");
 	    btnPlay.addActionListener(e -> {
-	        new GameWindow();
-
+	    	new SelectLevelWindow();
+	    	
 	        Window window = SwingUtilities.getWindowAncestor(btnPlay);
 	        if (window != null) {
-	            musica.close();
-	            window.dispose();
+	        	if (musica != null) {
+	        	    musica.stop();
+	        	    musica.close();
+	        	}
+	        	window.dispose();
 	        }
 	    });
 	    
-	    JButton btnHome = new RoundButton(
+	    JButton btnHome = new RoundedButton(
 	        "MENU",
 	        new ImageIcon(getClass().getResource("/images/home.png"))
 	    );
 
-	    btnHome.setBackground(UIColors.BUTTON);
-	    btnHome.setForeground(UIColors.BUTTON_TEXT);
-	    btnHome.setFont(AppFont.subtitle());
-	    btnHome.setPreferredSize(new Dimension(180, 60));
-	    btnHome.setMaximumSize(new Dimension(180, 60));
-	    btnHome.setMinimumSize(new Dimension(180, 60));
-	    btnHome.setAlignmentX(CENTER_ALIGNMENT);
-	    btnHome.setBorder(new EmptyBorder(10, 20, 10, 20));
+	    styleButton(btnHome);	    
 	    btnHome.setToolTipText("Haz clic para regresar al menú!");
 	    btnHome.addActionListener(e -> {
 	    	new HomeWindow();
 
 	        Window window = SwingUtilities.getWindowAncestor(btnHome);
 	        if (window != null) {
-	            musica.close();
-	            window.dispose();
+	        	if (musica != null) {
+	        	    musica.stop();
+	        	    musica.close();
+	        	}
+	        	window.dispose();
 	        }
 	    });
 
@@ -202,15 +189,16 @@ public class GameOverView extends JPanel {
 	
 	public void playMusic() {
 	    try {
-	        // Si ya hay música sonando, detenerla primero
+	        // si ya hay música sonando detenerla primero
 	        if (musica != null && musica.isRunning()) {
 	            musica.stop();
 	            musica.close();
 	        }
 
-	        File archivo = new File("src/music/game-over.wav");
-	        AudioInputStream audio = AudioSystem.getAudioInputStream(archivo);
-
+	        AudioInputStream audio = AudioSystem.getAudioInputStream(
+        	    getClass().getResource("/music/game-over.wav")
+        	);
+	        
 	        musica = AudioSystem.getClip();
 	        musica.open(audio);
 
@@ -228,6 +216,17 @@ public class GameOverView extends JPanel {
 
 	    // dibujar gif de fondo
 	    g.drawImage(backgroundGif, 0, 0, getWidth(), getHeight(), this);
+	}
+	
+	private void styleButton(JButton btn) {
+	    btn.setBackground(UIColors.SNAKE_GREEN);
+	    btn.setForeground(UIColors.BUTTON_TEXT);
+	    btn.setFont(AppFont.subtitle());
+	    btn.setPreferredSize(new Dimension(240, 60));
+	    btn.setMaximumSize(new Dimension(240, 60));
+	    btn.setMinimumSize(new Dimension(240, 60));
+	    btn.setAlignmentX(CENTER_ALIGNMENT);
+	    btn.setBorder(new EmptyBorder(10, 20, 10, 20));
 	}
 
 }

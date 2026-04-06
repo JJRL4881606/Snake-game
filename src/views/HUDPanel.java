@@ -20,9 +20,8 @@ public class HUDPanel extends JPanel {
         setBackground(new Color(0, 0, 0));
         setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
         setBorder(BorderFactory.createMatteBorder(
-        	    0, 0, 2, 0, UIColors.SNAKE_GREEN
-        	));
-
+    	    0, 0, 2, 0, UIColors.SNAKE_GREEN
+    	));
         
         lblPuntos = new JLabel("Puntos: 0");
         lblPuntos.setForeground(UIColors.SNAKE_GREEN);
@@ -40,7 +39,7 @@ public class HUDPanel extends JPanel {
         lblPuntos.setText("Puntos: " + puntos);
     }
 
-    public void setDificultad(String nivel) {
+    public void setDifficulty(String nivel) {
         lblDificultad.setText("Dificultad: " + nivel);
 
         switch (nivel) {

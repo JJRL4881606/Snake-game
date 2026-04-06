@@ -4,8 +4,8 @@ import java.awt.Font;
 
 public class AppFont {
 
-	private static Font platinum;
 	private static Font ka1;
+	private static Font platinum;
 	
 	static {
 	    try {

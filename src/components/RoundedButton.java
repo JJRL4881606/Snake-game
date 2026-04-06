@@ -2,28 +2,26 @@ package components;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
 @SuppressWarnings("serial")
-public class RoundButton extends JButton {
+public class RoundedButton extends JButton {
 
     private boolean drawBorder;
     private float borderThickness;
     private int cornerRadius = 15;
-    private Color hoverColor;
     private boolean hovering = false;
 
-    public RoundButton(String label, Icon icon) {
+    public RoundedButton(String label, Icon icon) {
         super(label, icon);
         setContentAreaFilled(false);
         setFocusPainted(false);
         setBorderPainted(false);
         setOpaque(false);
 
-        hoverColor = getBackground().brighter();
-
-        addMouseListener(new java.awt.event.MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 hovering = true;
@@ -47,8 +45,9 @@ public class RoundButton extends JButton {
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        Color colorBase = hovering ? hoverColor : getBackground();
+        
+        Color base = getBackground();
+        Color colorBase = hovering ? base.darker() : base;
 
         if (getModel().isArmed()) {
             colorBase = colorBase.darker();
